@@ -49,4 +49,4 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem "rspec-rails", "~> 5.0"
 
-gem 'rack-cors', :require => 'rack/cors
+gem 'rack-cors', :require => 'rack/cors'
