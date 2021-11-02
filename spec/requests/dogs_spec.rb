@@ -34,61 +34,86 @@ RSpec.describe "Dogs", type: :request do
     end
 
     describe "PATCH /update" do
-    it "updates a dog" do
-      dog_params = {
-        dog: {
-          name: 'Sparky',
-          age: 9,
-          enjoys: 'driving cars off a cliff'
-        }
-      }
-      post '/dogs', params: dog_params
-      dog = Dog.first
+          it "updates a dog" do
+            dog_params = {
+              dog: {
+                name:'Sammy',
+                age:5,
+                enjoys:'hanging out with dog pals'
+              }
+            }
+            post '/dogs', params: dog_params
+            dog = Dog.first
+            updated_dog_params = {
+              dog: {
+                name:'Sammy',
+                age:10,
+                enjoys:'hanging out with dog pals'
+              }
+            }
+            patch "/dogs/#{dog.id}", params: updated_dog_params
+            dog = Dog.first
+            expect(response).to have_http_status(200)
+            expect(dog.age).to eq 8
+        end
+      end
 
-      updated_dog_params = {
-        dog: {
-          name: "Sparky",
-          age: 10,
-          enjoys: 'driving cars off a cliff'
-        }
-      }
-      patch "/dogs/#{dog.id}", params: updated_dog_params
-      dog = Dog.first
-      expect(response).to have_http_status(200)
-      expect(dog.age).to eq 10
-    end
-  end
+    describe "DELETE /destroy" do
+        it 'deletes a dog' do
+          dog_params = {
+            dog: {
+              name: 'Fred',
+              age: 4,
+              enjoys: 'Likes to drewl all over sofas'
+            }
+          }
+          post '/dogs', params: dog_params
+          dog = Dog.first
+          delete "/dogs/#{dog.id}"
+          expect(response).to have_http_status(200)
+          dogs = Dog.all
+          expect(dogs).to be_empty
+        end
+      end
 
-  describe "DELETE /destroy" do
-    it 'deletes a dog' do
-      # create the dog
-      dog_params = {
-        dog: {
-          name: 'Roger',
-          age: 2,
-          enjoys: 'Eats garden veggies'
-        }
-      }
-      post '/dogs', params: dog_params
-      dog = Dog.first
-      delete "/dogs/#{dog.id}"
-      expect(response).to have_http_status(200)
-      dogs = Dog.all
-      expect(dogs).to be_empty
-    end
-  end
   describe 'dog validation error codes' do
     it 'does not create a dog with a name' do
       dog_params = {
         dog: {
-          age: 2,
-          enjoys: 'Eats garden veggies'
+          age: 4,
+          enjoys: 'running around in circles'
         }
       }
       post '/dogs', params: dog_params
       expect(response).to have_http_status(422)
       dog = JSON.parse(response.body)
       expect(dog['name']).to include "can't be blank"
+    end
+
+    it 'does not create a dog with an age' do
+      dog_params = {
+        dog: {
+          name: 'Levi',
+          enjoys: 'running around in circles'
+        }
+      }
+      post '/dogs', params: dog_params
+      expect(response).to have_http_status(422)
+      dog = JSON.parse(response.body)
+      expect(dog['age']).to include "can't be blank"
+    end
+
+    it 'does not create a dog with an enjoys' do
+      dog_params = {
+        dog: {
+          name: 'Lola',
+          age: 10
+        }
+      }
+      post '/dogs', params: dog_params
+      expect(response).to have_http_status(422)
+      dog = JSON.parse(response.body)
+      expect(dog['enjoys']).to include "can't be blank"
     end
   end
 end
