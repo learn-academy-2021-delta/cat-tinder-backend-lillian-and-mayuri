@@ -77,5 +77,18 @@ RSpec.describe "Dogs", type: :request do
       expect(dogs).to be_empty
     end
   end
-
+  describe 'dog validation error codes' do
+    it 'does not create a dog with a name' do
+      dog_params = {
+        dog: {
+          age: 2,
+          enjoys: 'Eats garden veggies'
+        }
+      }
+      post '/dogs', params: dog_params
+      expect(response).to have_http_status(422)
+      dog = JSON.parse(response.body)
+      expect(dog['name']).to include "can't be blank"
+    end
+  end
 end
